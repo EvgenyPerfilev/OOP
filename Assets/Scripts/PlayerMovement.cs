@@ -2,8 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerState
+{
+    walk,
+    attack,
+    interact
+} 
+
 public class PlayerMovement: MonoBehaviour {
 
+    public PlayerState currentState; //текущее состояние
     public float speed; //скорость игрока
     private Rigidbody2D myRigidbody;
     private Vector3 change; //позиция игрока
@@ -11,6 +19,7 @@ public class PlayerMovement: MonoBehaviour {
 
     // Это для инициализации
     void Start () {
+        currentState = PlayerState.walk;
         animator = GetComponent<Animator>(); //ссылка на анимацию персонажа в Unity 
         myRigidbody = GetComponent<Rigidbody2D>(); //ссылка на тело в Unity 
 	}
@@ -20,7 +29,24 @@ public class PlayerMovement: MonoBehaviour {
         change = Vector3.zero; // делаем начальную позицию(0,0)
         change.x = Input.GetAxisRaw("Horizontal");
         change.y = Input.GetAxisRaw("Vertical");
-        UpdateAnimationAndMove();
+        if(Input.GetButtonDown("attack") && currentState != PlayerState.attack)
+        {
+            StartCoroutine(AttackCo());
+        }
+        else if(currentState == PlayerState.walk)
+            {
+                UpdateAnimationAndMove();
+            }
+    }
+
+    private IEnumerator AttackCo()
+    {
+        animator.SetBool("attacking", true);
+        currentState = PlayerState.attack;
+        yield return null;
+        animator.SetBool("attacking", false);
+        yield return new WaitForSeconds(.3f);
+        currentState = PlayerState.walk;
     }
 
     void UpdateAnimationAndMove() //обновление анимации и перемещения
