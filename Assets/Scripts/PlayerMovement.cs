@@ -6,7 +6,9 @@ public enum PlayerState
 {
     walk,
     attack,
-    interact
+    interact,
+    stagger, 
+    idle
 } 
 
 public class PlayerMovement: MonoBehaviour {
@@ -22,6 +24,8 @@ public class PlayerMovement: MonoBehaviour {
         currentState = PlayerState.walk;
         animator = GetComponent<Animator>(); //ссылка на анимацию персонажа в Unity 
         myRigidbody = GetComponent<Rigidbody2D>(); //ссылка на тело в Unity 
+        animator.SetFloat("moveX", 0);
+        animator.SetFloat("moveY", -1);
 	}
 
     // Обновление вызывается один раз за кадр
@@ -29,11 +33,11 @@ public class PlayerMovement: MonoBehaviour {
         change = Vector3.zero; // делаем начальную позицию(0,0)
         change.x = Input.GetAxisRaw("Horizontal");
         change.y = Input.GetAxisRaw("Vertical");
-        if(Input.GetButtonDown("attack") && currentState != PlayerState.attack)
+        if(Input.GetButtonDown("attack") && currentState != PlayerState.attack && currentState != PlayerState.stagger)
         {
             StartCoroutine(AttackCo());
         }
-        else if(currentState == PlayerState.walk)
+        else if(currentState == PlayerState.walk || currentState == PlayerState.idle)
             {
                 UpdateAnimationAndMove();
             }
@@ -64,8 +68,25 @@ public class PlayerMovement: MonoBehaviour {
 
     void MoveCharacter() //метод движения
     {
+        change.Normalize();
         myRigidbody.MovePosition(
                 transform.position + change * speed * Time.deltaTime //формула движения
             );
+    }
+
+    public void Knock (float knockTime)
+    {
+        StartCoroutine(KnockCo(knockTime));
+    }
+
+    private IEnumerator KnockCo(float knockTime)
+    {
+        if (myRigidbody != null)
+        {
+            yield return new WaitForSeconds(knockTime);
+            myRigidbody.velocity = Vector2.zero;
+            currentState = PlayerState.idle;
+            myRigidbody.velocity = Vector2.zero;
+        }
     }
 }
