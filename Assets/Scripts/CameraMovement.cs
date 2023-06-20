@@ -11,8 +11,8 @@ public class CameraMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+        //transform.position = new Vector3(target.position.x, target.position.y, transform.position.z); //не увидел как влияет код на игру, наверно лучше убрать 
+    }
 	
 	// Update is called once per frame
 	void LateUpdate () {

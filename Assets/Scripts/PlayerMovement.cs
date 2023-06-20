@@ -20,6 +20,7 @@ public class PlayerMovement: MonoBehaviour {
     private Animator animator; //анимация игрока
     public FloatValue currentHealth; //cостояние здоровья
     public Signal playerHealthSignal; //сигнал о здоровье
+    public VectorValue startingPosition;
 
     // Это для инициализации
     void Start () {
@@ -28,6 +29,7 @@ public class PlayerMovement: MonoBehaviour {
         myRigidbody = GetComponent<Rigidbody2D>(); //ссылка на тело в Unity 
         animator.SetFloat("moveX", 0);
         animator.SetFloat("moveY", -1);
+        transform.position = startingPosition.initialValue;
 	}
 
     // Обновление вызывается один раз за кадр
